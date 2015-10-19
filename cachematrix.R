@@ -1,16 +1,36 @@
-## first commit - to test
-## Put comments here that give an overall description of what your
-## functions do
+## pretty intrusive, heavy lifting memoization
+## client  code needs to know about the memoization, and needs to explicitly check if  
+## the result's been cached
 
-## Write a short comment describing this function
-
+## create cache object to set/get a matrix and its inverse
+## note OO-like set/get list returning accessors 
 makeCacheMatrix <- function(x = matrix()) {
-
+  invM <- NULL
+  set <- function(y) {
+    x <<- y
+    invM <<- NULL
+  }
+  get <- function() x
+  setinverse <- function(i) invM <<- i
+  getinverse <- function() invM
+  list(set = set, get = get,
+       setinverse = setinverse,
+       getinverse = getinverse)
 }
 
 
-## Write a short comment describing this function
+## uses cache object to get the cached inverse if it's there,
+## otherwise solves the inverse and caches it
 
 cacheSolve <- function(x, ...) {
-        ## Return a matrix that is the inverse of 'x'
+        invM <- x$getinverse()
+        if (!is.null(invM)){
+          message("getting inverse from cache")
+          return(invM)
+        }
+        mat <- x$get()
+        i <- solve(mat) # we're assured this will work       
+        message("adding inverse to cache")
+        x$setinverse(i)
+        i
 }
